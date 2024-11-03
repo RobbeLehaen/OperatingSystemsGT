@@ -10,8 +10,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/robbelehaen/OperatingSystemsGT/clion/lab3/dplist.c" "CMakeFiles/lab3.dir/dplist.c.o" "gcc" "CMakeFiles/lab3.dir/dplist.c.o.d"
   "/home/robbelehaen/OperatingSystemsGT/clion/lab3/dplist_test.c" "CMakeFiles/lab3.dir/dplist_test.c.o" "gcc" "CMakeFiles/lab3.dir/dplist_test.c.o.d"
-  "/home/robbelehaen/OperatingSystemsGT/clion/lab3/ourtest.c" "CMakeFiles/lab3.dir/ourtest.c.o" "gcc" "CMakeFiles/lab3.dir/ourtest.c.o.d"
-  "/home/robbelehaen/OperatingSystemsGT/clion/lab3/randomtest.c" "CMakeFiles/lab3.dir/randomtest.c.o" "gcc" "CMakeFiles/lab3.dir/randomtest.c.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

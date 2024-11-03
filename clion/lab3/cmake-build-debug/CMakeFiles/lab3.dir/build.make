@@ -83,24 +83,10 @@ CMakeFiles/lab3.dir/dplist.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/lab3.dir/dplist.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/robbelehaen/OperatingSystemsGT/clion/lab3/dplist.c -o CMakeFiles/lab3.dir/dplist.c.s
 
-CMakeFiles/lab3.dir/ourtest.c.o: CMakeFiles/lab3.dir/flags.make
-CMakeFiles/lab3.dir/ourtest.c.o: /home/robbelehaen/OperatingSystemsGT/clion/lab3/ourtest.c
-CMakeFiles/lab3.dir/ourtest.c.o: CMakeFiles/lab3.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robbelehaen/OperatingSystemsGT/clion/lab3/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/lab3.dir/ourtest.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/lab3.dir/ourtest.c.o -MF CMakeFiles/lab3.dir/ourtest.c.o.d -o CMakeFiles/lab3.dir/ourtest.c.o -c /home/robbelehaen/OperatingSystemsGT/clion/lab3/ourtest.c
-
-CMakeFiles/lab3.dir/ourtest.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/lab3.dir/ourtest.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/robbelehaen/OperatingSystemsGT/clion/lab3/ourtest.c > CMakeFiles/lab3.dir/ourtest.c.i
-
-CMakeFiles/lab3.dir/ourtest.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/lab3.dir/ourtest.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/robbelehaen/OperatingSystemsGT/clion/lab3/ourtest.c -o CMakeFiles/lab3.dir/ourtest.c.s
-
 CMakeFiles/lab3.dir/dplist_test.c.o: CMakeFiles/lab3.dir/flags.make
 CMakeFiles/lab3.dir/dplist_test.c.o: /home/robbelehaen/OperatingSystemsGT/clion/lab3/dplist_test.c
 CMakeFiles/lab3.dir/dplist_test.c.o: CMakeFiles/lab3.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robbelehaen/OperatingSystemsGT/clion/lab3/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/lab3.dir/dplist_test.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robbelehaen/OperatingSystemsGT/clion/lab3/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/lab3.dir/dplist_test.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/lab3.dir/dplist_test.c.o -MF CMakeFiles/lab3.dir/dplist_test.c.o.d -o CMakeFiles/lab3.dir/dplist_test.c.o -c /home/robbelehaen/OperatingSystemsGT/clion/lab3/dplist_test.c
 
 CMakeFiles/lab3.dir/dplist_test.c.i: cmake_force
@@ -111,37 +97,19 @@ CMakeFiles/lab3.dir/dplist_test.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/lab3.dir/dplist_test.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/robbelehaen/OperatingSystemsGT/clion/lab3/dplist_test.c -o CMakeFiles/lab3.dir/dplist_test.c.s
 
-CMakeFiles/lab3.dir/randomtest.c.o: CMakeFiles/lab3.dir/flags.make
-CMakeFiles/lab3.dir/randomtest.c.o: /home/robbelehaen/OperatingSystemsGT/clion/lab3/randomtest.c
-CMakeFiles/lab3.dir/randomtest.c.o: CMakeFiles/lab3.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robbelehaen/OperatingSystemsGT/clion/lab3/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/lab3.dir/randomtest.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/lab3.dir/randomtest.c.o -MF CMakeFiles/lab3.dir/randomtest.c.o.d -o CMakeFiles/lab3.dir/randomtest.c.o -c /home/robbelehaen/OperatingSystemsGT/clion/lab3/randomtest.c
-
-CMakeFiles/lab3.dir/randomtest.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/lab3.dir/randomtest.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/robbelehaen/OperatingSystemsGT/clion/lab3/randomtest.c > CMakeFiles/lab3.dir/randomtest.c.i
-
-CMakeFiles/lab3.dir/randomtest.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/lab3.dir/randomtest.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/robbelehaen/OperatingSystemsGT/clion/lab3/randomtest.c -o CMakeFiles/lab3.dir/randomtest.c.s
-
 # Object files for target lab3
 lab3_OBJECTS = \
 "CMakeFiles/lab3.dir/dplist.c.o" \
-"CMakeFiles/lab3.dir/ourtest.c.o" \
-"CMakeFiles/lab3.dir/dplist_test.c.o" \
-"CMakeFiles/lab3.dir/randomtest.c.o"
+"CMakeFiles/lab3.dir/dplist_test.c.o"
 
 # External object files for target lab3
 lab3_EXTERNAL_OBJECTS =
 
 lab3: CMakeFiles/lab3.dir/dplist.c.o
-lab3: CMakeFiles/lab3.dir/ourtest.c.o
 lab3: CMakeFiles/lab3.dir/dplist_test.c.o
-lab3: CMakeFiles/lab3.dir/randomtest.c.o
 lab3: CMakeFiles/lab3.dir/build.make
 lab3: CMakeFiles/lab3.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/robbelehaen/OperatingSystemsGT/clion/lab3/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable lab3"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/robbelehaen/OperatingSystemsGT/clion/lab3/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable lab3"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/lab3.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

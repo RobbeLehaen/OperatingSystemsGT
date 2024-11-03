@@ -3,10 +3,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/lab3.dir/dplist.c.o.d"
   "CMakeFiles/lab3.dir/dplist_test.c.o"
   "CMakeFiles/lab3.dir/dplist_test.c.o.d"
-  "CMakeFiles/lab3.dir/ourtest.c.o"
-  "CMakeFiles/lab3.dir/ourtest.c.o.d"
-  "CMakeFiles/lab3.dir/randomtest.c.o"
-  "CMakeFiles/lab3.dir/randomtest.c.o.d"
   "lab3"
   "lab3.pdb"
 )

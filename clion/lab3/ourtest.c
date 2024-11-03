@@ -35,12 +35,14 @@ void *element_copy(void *element)
     return (void *)copy;
 }
 
-void element_free(void **element)
-{
-    free((((my_element_t *)*element))->name);
-    free(*element);
-    *element = NULL;
+void element_free(void **element) {
+    if (element != NULL && *element != NULL) {
+        free((((my_element_t *)*element))->name);
+        free(*element);
+        *element = NULL;
+    }
 }
+
 
 int element_compare(void *x, void *y)
 {
@@ -124,7 +126,7 @@ void test2()
 
     dplist_t *list = NULL;
 
-  
+
     list = dpl_insert_at_index(NULL, content, -1, false);
     ck_assert_msg(list == NULL, "Failure: expected list to be NULL");
 
@@ -208,7 +210,7 @@ void test3()
 
     ck_assert_msg(dpl_size(list) == 3, "Failure: expected list to have size of 3");
 
-                
+
 
     list = dpl_remove_at_index(list, -2, true);
 
@@ -233,7 +235,7 @@ int main(void)
     test1();
     test2();
     test3();
-
+    printf("All tests passed!\n");
   
     return 0;
 }

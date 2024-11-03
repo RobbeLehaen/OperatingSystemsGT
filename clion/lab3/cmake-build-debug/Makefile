@@ -177,54 +177,6 @@ dplist_test.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab3.dir/build.make CMakeFiles/lab3.dir/dplist_test.c.s
 .PHONY : dplist_test.c.s
 
-ourtest.o: ourtest.c.o
-.PHONY : ourtest.o
-
-# target to build an object file
-ourtest.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab3.dir/build.make CMakeFiles/lab3.dir/ourtest.c.o
-.PHONY : ourtest.c.o
-
-ourtest.i: ourtest.c.i
-.PHONY : ourtest.i
-
-# target to preprocess a source file
-ourtest.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab3.dir/build.make CMakeFiles/lab3.dir/ourtest.c.i
-.PHONY : ourtest.c.i
-
-ourtest.s: ourtest.c.s
-.PHONY : ourtest.s
-
-# target to generate assembly for a file
-ourtest.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab3.dir/build.make CMakeFiles/lab3.dir/ourtest.c.s
-.PHONY : ourtest.c.s
-
-randomtest.o: randomtest.c.o
-.PHONY : randomtest.o
-
-# target to build an object file
-randomtest.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab3.dir/build.make CMakeFiles/lab3.dir/randomtest.c.o
-.PHONY : randomtest.c.o
-
-randomtest.i: randomtest.c.i
-.PHONY : randomtest.i
-
-# target to preprocess a source file
-randomtest.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab3.dir/build.make CMakeFiles/lab3.dir/randomtest.c.i
-.PHONY : randomtest.c.i
-
-randomtest.s: randomtest.c.s
-.PHONY : randomtest.s
-
-# target to generate assembly for a file
-randomtest.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab3.dir/build.make CMakeFiles/lab3.dir/randomtest.c.s
-.PHONY : randomtest.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -240,12 +192,6 @@ help:
 	@echo "... dplist_test.o"
 	@echo "... dplist_test.i"
 	@echo "... dplist_test.s"
-	@echo "... ourtest.o"
-	@echo "... ourtest.i"
-	@echo "... ourtest.s"
-	@echo "... randomtest.o"
-	@echo "... randomtest.i"
-	@echo "... randomtest.s"
 .PHONY : help
 
 

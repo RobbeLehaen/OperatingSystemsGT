@@ -55,10 +55,10 @@ void dpl_free(dplist_t **list, bool free_element) {
 }
 
 dplist_t *dpl_insert_at_index(dplist_t *list, void *element, int index, bool insert_copy) {
-    if (list == NULL) return NULL; 
+    if (list == NULL) return NULL;
 
     dplist_node_t *new_node = malloc(sizeof(dplist_node_t));
-    if (new_node == NULL) return NULL; 
+    if (new_node == NULL) return NULL;
 
     new_node->element = insert_copy ? list->element_copy(element) : element;
     new_node->next = NULL;
@@ -99,6 +99,8 @@ dplist_t *dpl_insert_at_index(dplist_t *list, void *element, int index, bool ins
     return list;
 }
 
+
+
 dplist_t *dpl_remove_at_index(dplist_t *list, int index, bool free_element) {
     if (list == NULL || list->head == NULL) return list;
 
@@ -121,7 +123,7 @@ dplist_t *dpl_remove_at_index(dplist_t *list, int index, bool free_element) {
 
     if (current->prev != NULL) {
         current->prev->next = current->next;
-    } else {  // We're removing the head
+    } else {
         list->head = current->next;
     }
     if (current->next != NULL) {
@@ -168,12 +170,12 @@ int dpl_get_index_of_element(dplist_t *list, void *element) {
     int index = 0;
     while (current != NULL) {
         if (list->element_compare(current->element, element) == 0) {
-            return index; 
+            return index;
         }
         index++;
         current = current->next;
     }
-    return -1; 
+    return -1;
 }
 
 dplist_node_t *dpl_get_reference_at_index(dplist_t *list, int index) {

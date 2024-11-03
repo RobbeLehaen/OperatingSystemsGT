@@ -5,7 +5,6 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(lab3
         dplist.c
-        ourtest.c
         dplist_test.c
-        randomtest.c
+
 )

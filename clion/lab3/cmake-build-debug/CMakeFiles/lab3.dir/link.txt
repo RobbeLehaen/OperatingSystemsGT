@@ -1,1 +1,1 @@
-/usr/bin/cc -g CMakeFiles/lab3.dir/dplist.c.o CMakeFiles/lab3.dir/ourtest.c.o CMakeFiles/lab3.dir/dplist_test.c.o CMakeFiles/lab3.dir/randomtest.c.o -o lab3
+/usr/bin/cc -g CMakeFiles/lab3.dir/dplist.c.o CMakeFiles/lab3.dir/dplist_test.c.o -o lab3
