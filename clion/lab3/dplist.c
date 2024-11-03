@@ -41,14 +41,17 @@ void dpl_free(dplist_t **list, bool free_element) {
     dplist_node_t *current = (*list)->head;
     while (current != NULL) {
         dplist_node_t *next = current->next;
-        if (free_element) {
+
+        if (free_element && current->element != NULL) {
             (*list)->element_free(&(current->element));
+            current->element = NULL; // Set to NULL to avoid accidental re-access
         }
+
         free(current);
         current = next;
     }
     free(*list);
-    *list = NULL;
+    *list = NULL; // Set the list pointer to NULL after freeing
 }
 
 dplist_t *dpl_insert_at_index(dplist_t *list, void *element, int index, bool insert_copy) {
@@ -100,28 +103,41 @@ dplist_t *dpl_remove_at_index(dplist_t *list, int index, bool free_element) {
     if (list == NULL || list->head == NULL) return list;
 
     dplist_node_t *current = list->head;
-    for (int i = 0; current != NULL && i < index; i++) {
+
+    // Handle negative or zero index by setting it to 0
+    if (index <= 0) {
+        index = 0;
+    }
+
+    // Traverse the list to find the node at the specified index
+    int i = 0;
+    while (current->next != NULL && i < index) {
         current = current->next;
+        i++;
     }
 
-    if (current == NULL) return list;
+    // If index is out of bounds, `current` now points to the last node.
 
-    if (free_element) {
+    // Free the element if required
+    if (free_element && current->element != NULL) {
         list->element_free(&(current->element));
+        current->element = NULL;  // Avoid accidental re-access
     }
 
+    // Adjust pointers to remove the node
     if (current->prev != NULL) {
         current->prev->next = current->next;
-    } else {
+    } else {  // We're removing the head
         list->head = current->next;
     }
     if (current->next != NULL) {
         current->next->prev = current->prev;
     }
 
-    free(current);
+    free(current);  // Free the node itself
     return list;
 }
+
 
 int dpl_size(dplist_t *list) {
     if (list == NULL) return 0;
@@ -161,21 +177,30 @@ int dpl_get_index_of_element(dplist_t *list, void *element) {
 }
 
 dplist_node_t *dpl_get_reference_at_index(dplist_t *list, int index) {
-    if (list == NULL || index < 0) {
-        return NULL; 
+    if (list == NULL) {
+        return NULL;  // Return NULL if the list is NULL
+    }
+
+    if (index < 0) {
+        // Return the first node if index is negative
+        return list->head;
     }
 
     dplist_node_t *current = list->head;
-    for (int i = 0; i < index && current != NULL; i++) {
+    dplist_node_t *last = list->head;
+
+    for (int i = 0; i < index; i++) {
+        if (current == NULL) {
+            return last;  // Return the last valid node if index is out of bounds
+        }
+        last = current;  // Keep track of the last valid node
         current = current->next;
     }
 
-    return current; 
+    return current != NULL ? current : last;  // Return the node at the specified index, or the last if out of bounds
 }
+
 
 void *dpl_get_element_at_reference(dplist_t *list, dplist_node_t *reference) {
     return (reference != NULL) ? reference->element : NULL;
 }
-
-
-

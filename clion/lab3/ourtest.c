@@ -227,9 +227,6 @@ void test3()
 }
 
 
-
-
-
 int main(void)
 {
 

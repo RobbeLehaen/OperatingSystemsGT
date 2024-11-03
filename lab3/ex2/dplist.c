@@ -83,7 +83,7 @@ dplist_t *dpl_insert_at_index(dplist_t *list, element_t element, int index) {
         list_node->next = list->head;
         list->head->prev = list_node;
         list->head = list_node;
-    } x
+    } 
     else {
         dplist_node_t *ref_at_index = dpl_get_reference_at_index(list, index);
         
