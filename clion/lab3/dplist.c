@@ -44,14 +44,14 @@ void dpl_free(dplist_t **list, bool free_element) {
 
         if (free_element && current->element != NULL) {
             (*list)->element_free(&(current->element));
-            current->element = NULL; // Set to NULL to avoid accidental re-access
+            current->element = NULL;
         }
 
         free(current);
         current = next;
     }
     free(*list);
-    *list = NULL; // Set the list pointer to NULL after freeing
+    *list = NULL;
 }
 
 dplist_t *dpl_insert_at_index(dplist_t *list, void *element, int index, bool insert_copy) {
@@ -61,7 +61,7 @@ dplist_t *dpl_insert_at_index(dplist_t *list, void *element, int index, bool ins
     if (new_node == NULL) return NULL; 
 
     new_node->element = insert_copy ? list->element_copy(element) : element;
-    new_node->next = NULL; 
+    new_node->next = NULL;
     new_node->prev = NULL;
 
     if (index <= 0 || list->head == NULL) {
@@ -104,27 +104,21 @@ dplist_t *dpl_remove_at_index(dplist_t *list, int index, bool free_element) {
 
     dplist_node_t *current = list->head;
 
-    // Handle negative or zero index by setting it to 0
     if (index <= 0) {
         index = 0;
     }
 
-    // Traverse the list to find the node at the specified index
     int i = 0;
     while (current->next != NULL && i < index) {
         current = current->next;
         i++;
     }
 
-    // If index is out of bounds, `current` now points to the last node.
-
-    // Free the element if required
     if (free_element && current->element != NULL) {
         list->element_free(&(current->element));
-        current->element = NULL;  // Avoid accidental re-access
+        current->element = NULL;
     }
 
-    // Adjust pointers to remove the node
     if (current->prev != NULL) {
         current->prev->next = current->next;
     } else {  // We're removing the head
@@ -134,7 +128,7 @@ dplist_t *dpl_remove_at_index(dplist_t *list, int index, bool free_element) {
         current->next->prev = current->prev;
     }
 
-    free(current);  // Free the node itself
+    free(current);
     return list;
 }
 
@@ -155,10 +149,16 @@ void *dpl_get_element_at_index(dplist_t *list, int index) {
     if (list == NULL || list->head == NULL) return NULL;
 
     dplist_node_t *current = list->head;
-    for (int i = 0; current != NULL && i < index; i++) {
+
+    if (index <= 0) {
+        return current->element;
+    }
+
+    for (int i = 0; current->next != NULL && i < index; i++) {
         current = current->next;
     }
-    return (current != NULL) ? current->element : NULL; 
+
+    return current->element;
 }
 
 int dpl_get_index_of_element(dplist_t *list, void *element) {
@@ -177,30 +177,36 @@ int dpl_get_index_of_element(dplist_t *list, void *element) {
 }
 
 dplist_node_t *dpl_get_reference_at_index(dplist_t *list, int index) {
-    if (list == NULL) {
-        return NULL;  // Return NULL if the list is NULL
-    }
-
-    if (index < 0) {
-        // Return the first node if index is negative
-        return list->head;
+    if (list == NULL || list->head == NULL) {
+        return NULL;
     }
 
     dplist_node_t *current = list->head;
-    dplist_node_t *last = list->head;
 
-    for (int i = 0; i < index; i++) {
-        if (current == NULL) {
-            return last;  // Return the last valid node if index is out of bounds
-        }
-        last = current;  // Keep track of the last valid node
+    if (index <= 0) {
+        return current;
+    }
+
+    for (int i = 0; i < index && current->next != NULL; i++) {
         current = current->next;
     }
 
-    return current != NULL ? current : last;  // Return the node at the specified index, or the last if out of bounds
+    return current;
 }
 
-
 void *dpl_get_element_at_reference(dplist_t *list, dplist_node_t *reference) {
-    return (reference != NULL) ? reference->element : NULL;
+    if (list == NULL || list->head == NULL || reference == NULL) {
+        return NULL;
+    }
+
+    dplist_node_t *current = list->head;
+
+    while (current != NULL) {
+        if (current == reference) {
+            return reference->element;
+        }
+        current = current->next;
+    }
+
+    return NULL;
 }
