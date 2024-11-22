@@ -23,8 +23,7 @@ int create_log_process() {
     }
 
     if (logger_pid == 0) {
-        // Child process (logger)
-        close(log_pipe[1]); // Close write end
+        close(log_pipe[1]);
 
         FILE *log_file = fopen("gateway.log", "a");
         if (!log_file) {
@@ -39,27 +38,24 @@ int create_log_process() {
         while (1) {
             ssize_t bytes_read = read(log_pipe[0], buffer, BUFFER_SIZE);
             if (bytes_read <= 0) {
-                break; // End of input or error reading from pipe
+                break;
             }
 
-            buffer[bytes_read] = '\0'; // Null-terminate the string
+            buffer[bytes_read] = '\0';
 
-            // Format timestamp
             time_t now = time(NULL);
             struct tm *tm_info = localtime(&now);
             strftime(timestamp, sizeof(timestamp), "%a %b %d %H:%M:%S %Y", tm_info);
 
-            // Print formatted log entry
             fprintf(log_file, "%d - %s - %s\n", seq_num++, timestamp, buffer);
-            fflush(log_file); // Immediately write to file
+            fflush(log_file);
         }
 
         fclose(log_file);
-        close(log_pipe[0]); // Close read end
+        close(log_pipe[0]);
         exit(EXIT_SUCCESS);
     } else {
-        // Parent process
-        close(log_pipe[0]); // Close read end
+        close(log_pipe[0]);
         return 0;
     }
 }
@@ -67,7 +63,7 @@ int create_log_process() {
 int write_to_log_process(char *msg) {
     if (logger_pid == -1) {
         printf("Error: Logger process not created.\n");
-        return -1; // Logger process not created
+        return -1;
     }
 
     size_t len = strlen(msg);
@@ -81,11 +77,11 @@ int write_to_log_process(char *msg) {
 
 int end_log_process() {
     if (logger_pid == -1) {
-        return -1; // Logger process not created
+        return -1;
     }
 
-    close(log_pipe[1]); // Close write end to signal EOF
-    waitpid(logger_pid, NULL, 0); // Wait for logger process to terminate
+    close(log_pipe[1]);
+    waitpid(logger_pid, NULL, 0);
     logger_pid = -1;
     return 0;
 }
