@@ -1,0 +1,5 @@
+# ninja log v6
+0	52	1732274797559658674	CMakeFiles/milestone2.dir/main.c.o	6f8bd1e52f283e04
+1	45	1732276364115639504	CMakeFiles/milestone2.dir/logger.c.o	400267ea1d0e26bb
+45	71	1732276364159661504	milestone2	608586bab2ecb4f3
+136	214	1732275939948159373	CMakeFiles/milestone2.dir/sensor_db.c.o	bb7552aa07f60fc

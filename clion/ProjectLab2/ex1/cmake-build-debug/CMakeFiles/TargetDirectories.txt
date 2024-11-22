@@ -1,0 +1,3 @@
+/home/robbelehaen/OperatingSystemsGT/clion/Project lab2/ex1/cmake-build-debug/CMakeFiles/ex1.dir
+/home/robbelehaen/OperatingSystemsGT/clion/Project lab2/ex1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/robbelehaen/OperatingSystemsGT/clion/Project lab2/ex1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
