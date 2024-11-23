@@ -1,57 +1,55 @@
-0 - Fri Nov 22 13:37:38 2024 - Sensor database opened.
-1 - Fri Nov 22 13:37:39 2024 - Data inserted
-Data inserted
-Data inserted
-
-2 - Fri Nov 22 13:37:44 2024 - Data inserted
-Sensor database closed.
-0 - Fri Nov 22 13:38:05 2024 - Sensor database opened.
-1 - Fri Nov 22 13:38:06 2024 - Data inserted
-Data inserted
-Data inserted
-
-2 - Fri Nov 22 13:38:11 2024 - Data inserted
-Sensor database closed.
-0 - Fri Nov 22 13:39:06 2024 - Sensor database opened.
-1 - Fri Nov 22 13:39:07 2024 - Data inserted
-Data inserted
-Data inserted
-
-2 - Fri Nov 22 13:39:12 2024 - Data inserted
-Sensor database closed.
-0 - Fri Nov 22 13:41:07 2024 - Sensor database opened.
-1 - Fri Nov 22 13:41:08 2024 - Data inserted
-
-2 - Fri Nov 22 13:41:08 2024 - Data inserted
-Data inserted
-
-3 - Fri Nov 22 13:41:13 2024 - Data inserted
-
-4 - Fri Nov 22 13:41:13 2024 - Sensor database closed.
-0 - Fri Nov 22 13:41:36 2024 - Sensor database opened.
-1 - Fri Nov 22 13:41:37 2024 - Data inserted
-Data inserted
-Data inserted
-
-2 - Fri Nov 22 13:41:42 2024 - Data inserted
-
-3 - Fri Nov 22 13:41:42 2024 - Sensor database closed.
-0 - Fri Nov 22 13:42:23 2024 - Sensor database opened.
-1 - Fri Nov 22 13:42:24 2024 - Data inserted
-Data inserted
-Data inserted
-
-2 - Fri Nov 22 13:42:29 2024 - Data inserted
-Sensor database closed.
-0 - Fri Nov 22 13:44:08 2024 - Sensor database opened.
-1 - Fri Nov 22 13:44:09 2024 - Data inserted
-Data inserted
-Data inserted
-
-2 - Fri Nov 22 13:44:14 2024 - Data inserted
-
-3 - Fri Nov 22 13:44:14 2024 - Sensor database closed.
-0 - Fri Nov 22 13:44:39 2024 - Sensor database opened.
-1 - Fri Nov 22 13:44:40 2024 - Data insertedData insertedData inserted
-2 - Fri Nov 22 13:44:45 2024 - Data inserted
-3 - Fri Nov 22 13:44:45 2024 - Sensor database closed.
+0 - Sat Nov 23 11:16:48 2024 - Sensor database opened.
+1 - Sat Nov 23 11:16:49 2024 - Data inserted
+2 - Sat Nov 23 11:16:49 2024 - Data inserted
+3 - Sat Nov 23 11:16:49 2024 - Data inserted
+4 - Sat Nov 23 11:16:54 2024 - Data insertedSensor database closed.
+0 - Sat Nov 23 11:17:12 2024 - Sensor database opened.
+1 - Sat Nov 23 11:17:13 2024 - Data inserted
+2 - Sat Nov 23 11:17:13 2024 - Data inserted
+3 - Sat Nov 23 11:17:13 2024 - Data inserted
+4 - Sat Nov 23 11:17:18 2024 - Data inserted
+5 - Sat Nov 23 11:17:18 2024 - Sensor database closed.
+0 - Sat Nov 23 11:17:42 2024 - Sensor database opened.
+1 - Sat Nov 23 11:17:43 2024 - Data inserted
+2 - Sat Nov 23 11:17:43 2024 - Data insertedData inserted
+3 - Sat Nov 23 11:17:48 2024 - Data insertedSensor database closed.
+0 - Sat Nov 23 11:19:42 2024 - Sensor database opened.
+1 - Sat Nov 23 11:19:43 2024 - Data inserted: ID=1, Value=0.001000, Timestamp=1732357183
+2 - Sat Nov 23 11:19:43 2024 - Data inserted: ID=2, Value=0.002000, Timestamp=1732357183
+3 - Sat Nov 23 11:19:43 2024 - Data inserted: ID=3, Value=0.003000, Timestamp=1732357183
+4 - Sat Nov 23 11:19:48 2024 - Data inserted: ID=4, Value=0.003000, Timestamp=1732357183
+5 - Sat Nov 23 11:19:48 2024 - Sensor database closed.
+0 - Sat Nov 23 11:19:56 2024 - Sensor database opened.
+1 - Sat Nov 23 11:19:57 2024 - Data inserted: ID=1, Value=0.001000, Timestamp=1732357197
+2 - Sat Nov 23 11:19:57 2024 - Data inserted: ID=2, Value=0.002000, Timestamp=1732357197
+3 - Sat Nov 23 11:19:57 2024 - Data inserted: ID=3, Value=0.003000, Timestamp=1732357197
+4 - Sat Nov 23 11:20:02 2024 - Data inserted: ID=4, Value=0.003000, Timestamp=1732357197
+5 - Sat Nov 23 11:20:02 2024 - Sensor database closed.
+0 - Sat Nov 23 11:20:09 2024 - Sensor database opened.
+1 - Sat Nov 23 11:20:10 2024 - Data inserted: ID=1, Value=0.001000, Timestamp=1732357210
+2 - Sat Nov 23 11:20:10 2024 - Data inserted: ID=2, Value=0.002000, Timestamp=1732357210
+3 - Sat Nov 23 11:20:10 2024 - Data inserted: ID=3, Value=0.003000, Timestamp=1732357210
+4 - Sat Nov 23 11:20:15 2024 - Data inserted: ID=4, Value=0.003000, Timestamp=1732357210
+5 - Sat Nov 23 11:20:15 2024 - Sensor database closed.
+0 - Sat Nov 23 11:20:26 2024 - Sensor database opened.
+1 - Sat Nov 23 11:20:27 2024 - Data inserted: ID=1, Value=0.001000, Timestamp=1732357227
+2 - Sat Nov 23 11:20:27 2024 - Data inserted: ID=2, Value=0.002000, Timestamp=1732357227
+3 - Sat Nov 23 11:20:27 2024 - Data inserted: ID=3, Value=0.003000, Timestamp=1732357227
+4 - Sat Nov 23 11:20:32 2024 - Data inserted: ID=4, Value=0.003000, Timestamp=1732357227
+5 - Sat Nov 23 11:20:32 2024 - Sensor database closed.
+0 - Sat Nov 23 11:20:50 2024 - Sensor database opened.
+1 - Sat Nov 23 11:20:51 2024 - Data inserted
+2 - Sat Nov 23 11:20:51 2024 - Data inserted
+3 - Sat Nov 23 11:20:51 2024 - Data inserted
+4 - Sat Nov 23 11:20:56 2024 - Data inserted
+5 - Sat Nov 23 11:20:56 2024 - Sensor database closed.
+0 - Sat Nov 23 11:21:05 2024 - Sensor database opened.
+1 - Sat Nov 23 11:21:06 2024 - Data inserted
+2 - Sat Nov 23 11:21:06 2024 - Data inserted
+3 - Sat Nov 23 11:21:06 2024 - Data inserted
+0 - Sat Nov 23 11:21:08 2024 - Sensor database opened.
+1 - Sat Nov 23 11:21:09 2024 - Data inserted
+2 - Sat Nov 23 11:21:09 2024 - Data inserted
+3 - Sat Nov 23 11:21:09 2024 - Data inserted
+4 - Sat Nov 23 11:21:14 2024 - Data inserted
+5 - Sat Nov 23 11:21:14 2024 - Sensor database closed.

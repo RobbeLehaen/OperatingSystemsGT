@@ -2,14 +2,7 @@
 #include "logger.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <time.h>
-
-#define BUFFER_SIZE 1024
-
-static int log_pipe[2];
-static pid_t logger_pid = -1;
 
 FILE* open_db(char *filename, bool append) {
     FILE *f = fopen(filename, append ? "a" : "w");
@@ -18,11 +11,10 @@ FILE* open_db(char *filename, bool append) {
         return NULL;
     }
 
-    if (logger_pid == -1) {
-        int result = create_log_process();
-        if (result == -1) {
-            printf("Error: Logger process creation failed.\n");
-        }
+    if (create_log_process() == -1) {
+        printf("Error: Logger process creation failed.\n");
+        fclose(f);
+        return NULL;
     }
 
     if (write_to_log_process("Sensor database opened.") != 0) {
@@ -36,6 +28,7 @@ FILE* open_db(char *filename, bool append) {
 
 int insert_sensor(FILE *db_file, sensor_id_t id, sensor_value_t value, sensor_ts_t timestamp) {
     fprintf(db_file, "%d,%f,%ld\n", id, value, timestamp);
+    fflush(db_file); // Ensure data is flushed to the database
 
     char log_msg[256];
     snprintf(log_msg, sizeof(log_msg), "Data inserted");
@@ -48,10 +41,13 @@ int insert_sensor(FILE *db_file, sensor_id_t id, sensor_value_t value, sensor_ts
     return 0;
 }
 
-int close_db(FILE *f) {
-    fclose(f);
+int close_db(FILE *db_file) {
+    fclose(db_file);
 
-    write_to_log_process("Sensor database closed.");
+    if (write_to_log_process("Sensor database closed.") != 0) {
+        fprintf(stderr, "Error writing to log process\n");
+        return -1;
+    }
 
     return end_log_process();
 }
