@@ -30,6 +30,7 @@
                         exit(EXIT_FAILURE);                         \
                       }                                             \
                     } while(0)
+void datamgr_init();
 
 /**
  *  This method holds the core functionality of your datamgr. It takes in 2 file pointers to the sensor files and parses them. 

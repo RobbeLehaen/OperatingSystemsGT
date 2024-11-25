@@ -9,7 +9,7 @@
 #include <time.h>
 
 #define SET_MAX_TEMP 30
-#define SET_MIN_TEMP 10
+#define SET_MIN_TEMP 0
 
 typedef uint16_t sensor_id_t;
 typedef double sensor_value_t;

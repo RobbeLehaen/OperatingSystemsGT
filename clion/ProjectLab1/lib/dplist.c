@@ -57,51 +57,36 @@ void dpl_free(dplist_t **list, bool free_element) {
 dplist_t *dpl_insert_at_index(dplist_t *list, void *element, int index, bool insert_copy) {
     if (list == NULL) return NULL;
 
-    printf("dpl_insert_at_index called with index %d\n", index); // Debug print
     dplist_node_t *new_node = malloc(sizeof(dplist_node_t));
-    if (new_node == NULL) {
-        fprintf(stderr, "Error: Memory allocation failed for new node\n");
-        return NULL;
-    }
+    if (new_node == NULL) return NULL;
 
     new_node->element = insert_copy ? list->element_copy(element) : element;
     new_node->next = NULL;
     new_node->prev = NULL;
 
-    // Debug: Confirm new node is created
-    fprintf(stderr, "Inserting element at index %d: %p\n", index, new_node);
-    fflush(stderr); // Flush stderr to ensure it prints
-
     if (index <= 0 || list->head == NULL) {
-        // Insert at the head
         new_node->next = list->head;
         if (list->head != NULL) {
             list->head->prev = new_node;
         }
         list->head = new_node;
-        fprintf(stderr, "Inserted at head, new head: %p\n", list->head);
     } else {
-        // Insert somewhere after the head
         dplist_node_t *current = list->head;
         int i = 0;
 
-        // Traverse to the index
         while (current != NULL && i < index) {
             current = current->next;
             i++;
         }
 
         if (current == NULL) {
-            // If we reach the end of the list, insert at the tail
             current = list->head;
             while (current->next != NULL) {
                 current = current->next;
             }
             current->next = new_node;
             new_node->prev = current;
-            fprintf(stderr, "Inserted at tail\n");
         } else {
-            // Insert in the middle
             new_node->next = current;
             new_node->prev = current->prev;
 
@@ -109,15 +94,11 @@ dplist_t *dpl_insert_at_index(dplist_t *list, void *element, int index, bool ins
                 current->prev->next = new_node;
             }
             current->prev = new_node;
-            fprintf(stderr, "Inserted in the middle\n");
         }
     }
-
-    // Debugging: Print list size after insertion
-    fprintf(stderr, "List size after insertion: %d\n", dpl_size(list));
-    fflush(stderr); // Flush stderr to ensure it prints
     return list;
 }
+
 
 
 dplist_t *dpl_remove_at_index(dplist_t *list, int index, bool free_element) {
@@ -163,12 +144,8 @@ int dpl_size(dplist_t *list) {
         size++;
         current = current->next;
     }
-
-    // Debug: Print the size as we count the nodes
-    fprintf(stderr, "dpl_size: %d\n", size);
     return size;
 }
-
 
 void *dpl_get_element_at_index(dplist_t *list, int index) {
     if (list == NULL || list->head == NULL) return NULL;

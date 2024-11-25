@@ -1,7 +1,5 @@
 #include "datamgr.h"
-
 #include <inttypes.h>
-
 #include "lib/dplist.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,7 +14,7 @@ static double min_temp = SET_MIN_TEMP;
 static double max_temp = SET_MAX_TEMP;
 
 // Function to compare two sensor IDs for the list
-static int compare_sensor_ids(void *x, void *y) {
+int element_compare(void *x, void *y) {
     sensor_data_t *sensor_x = (sensor_data_t *)x;
     sensor_data_t *sensor_y = (sensor_data_t *)y;
     if (sensor_x->id < sensor_y->id) return -1;
@@ -25,18 +23,27 @@ static int compare_sensor_ids(void *x, void *y) {
 }
 
 // Function to copy sensor data (for list insertions)
-static void *copy_sensor_data(void *element) {
+void *copy_sensor_data(void *element) {
     sensor_data_t *new_sensor = (sensor_data_t *)malloc(sizeof(sensor_data_t));
-    ERROR_HANDLER(new_sensor == NULL, "Memory allocation failed for sensor data copy");
+    if (new_sensor == NULL) {
+        perror("Memory allocation failed for sensor data copy");
+        exit(1);  // Exit or handle error as appropriate
+    }
 
-    *new_sensor = *((sensor_data_t *)element);  // Copy the data
+    // Copy the data
+    new_sensor->id = ((sensor_data_t *)element)->id;
+    new_sensor->value = ((sensor_data_t *)element)->value;
+    new_sensor->ts = ((sensor_data_t *)element)->ts;
+
     return new_sensor;
 }
 
 // Function to free sensor data
-static void free_sensor_data(void **element) {
-    free(*element);
-    *element = NULL;
+void free_sensor_data(void **element) {
+    if (element != NULL && *element != NULL) {
+        free(*element);  // Free the struct
+        *element = NULL;  // Null the pointer
+    }
 }
 
 // Function to check if the temperature exceeds limits and log events
@@ -53,16 +60,13 @@ void datamgr_init() {
     fprintf(stderr, "Initializing data manager...\n");
 
     // Create the list
-    sensor_list = dpl_create(copy_sensor_data, free_sensor_data, compare_sensor_ids);
+    sensor_list = dpl_create(copy_sensor_data, free_sensor_data, element_compare);
     if (sensor_list == NULL) {
         fprintf(stderr, "Failed to create sensor list.\n");
         exit(1);  // or handle the error gracefully
     }
 
     fprintf(stderr, "Data manager initialized successfully.\n");
-
-    // Debug: Print initial list size
-    fprintf(stderr, "List size after initialization: %d\n", dpl_size(sensor_list));
 }
 
 // Parse the sensor map file and populate the sensor list
@@ -72,22 +76,18 @@ void datamgr_parse_sensor_files(FILE *fp_sensor_map, FILE *fp_sensor_data) {
     ERROR_HANDLER(fp_sensor_map == NULL, "Sensor map file could not be opened");
     ERROR_HANDLER(fp_sensor_data == NULL, "Sensor data file could not be opened");
 
-    fprintf(stderr, "Sensor map and data files opened successfully.\n");
-
     uint16_t room_id, sensor_id;
     while (fscanf(fp_sensor_map, "%" PRIu16 " %" PRIu16 "\n", (unsigned int*)&room_id, (unsigned int*)&sensor_id) == 2) {
-        fprintf(stderr, "Read room %u, sensor %u\n", room_id, sensor_id);
-
         sensor_data_t sensor;
         sensor.id = sensor_id;
         sensor.value = 0;  // Initial value
         sensor.ts = 0;     // No timestamp yet
 
         // Insert sensor data into the linked list
-        dpl_insert_at_index(sensor_list, &sensor, dpl_size(sensor_list), true);
-
-        // Debug print to check the list size after insertion
-        fprintf(stderr, "List size after insertion: %d\n", dpl_size(sensor_list));
+        dplist_t *result = dpl_insert_at_index(sensor_list, &sensor, dpl_size(sensor_list), true);
+        if (result == NULL) {
+            fprintf(stderr, "Failed to insert sensor with ID %" PRIu16 "\n", sensor.id);
+        }
     }
 
     // Debug: List all sensor IDs in the list after all insertions
@@ -96,37 +96,6 @@ void datamgr_parse_sensor_files(FILE *fp_sensor_map, FILE *fp_sensor_data) {
         sensor_data_t *sensor = (sensor_data_t *)dpl_get_element_at_index(sensor_list, i);
         fprintf(stderr, "Sensor ID in list: %" PRIu16 "\n", sensor->id);
     }
-
-    // Now read sensor data and update the list
-    time_t timestamp;
-    double temperature;
-    while (fread(&sensor_id, sizeof(sensor_id), 1, fp_sensor_data) == 1) {
-        fprintf(stderr, "Reading sensor data for sensor %" PRIu16 "\n", sensor_id);
-
-        fread(&temperature, sizeof(temperature), 1, fp_sensor_data);
-        fread(&timestamp, sizeof(timestamp), 1, fp_sensor_data);
-
-        sensor_data_t temp_sensor;
-        temp_sensor.id = sensor_id;
-        temp_sensor.value = temperature;
-        temp_sensor.ts = timestamp;
-
-        // Debug: Look for the sensor in the list
-        fprintf(stderr, "Looking for sensor ID: %" PRIu16 "\n", sensor_id);
-
-        // Check if the sensor exists in the list
-        int index = dpl_get_index_of_element(sensor_list, &temp_sensor);
-        if (index >= 0) {
-            sensor_data_t *existing_sensor = (sensor_data_t *)dpl_get_element_at_index(sensor_list, index);
-            existing_sensor->value = temperature;
-            existing_sensor->ts = timestamp;
-            check_temperature_limits(existing_sensor);
-        } else {
-            fprintf(stderr, "Error: Sensor ID %" PRIu16 " not found in the list.\n", sensor_id);
-        }
-    }
-
-    fprintf(stderr, "Completed reading sensor data and updating list.\n");
 }
 
 // Free all the memory used by the data manager
@@ -139,8 +108,6 @@ void datamgr_free() {
 
 // Get the room ID for a given sensor ID
 uint16_t datamgr_get_room_id(sensor_id_t sensor_id) {
-    fprintf(stderr, "Getting room ID for sensor ID %" PRIu16 "\n", sensor_id);
-
     sensor_data_t temp_sensor;
     temp_sensor.id = sensor_id;
 
@@ -148,14 +115,11 @@ uint16_t datamgr_get_room_id(sensor_id_t sensor_id) {
     ERROR_HANDLER(index == -1, "Sensor ID not found");
     sensor_data_t *sensor = (sensor_data_t *)dpl_get_element_at_index(sensor_list, index);
 
-    fprintf(stderr, "Room ID for sensor ID %" PRIu16 " is %" PRIu16 "\n", sensor_id, sensor->id);
     return sensor->id;  // In this case, the sensor ID and room ID are the same
 }
 
 // Get the running average for a given sensor ID
 sensor_value_t datamgr_get_avg(sensor_id_t sensor_id) {
-    fprintf(stderr, "Getting running average for sensor ID %" PRIu16 "\n", sensor_id);
-
     sensor_data_t temp_sensor;
     temp_sensor.id = sensor_id;
 
@@ -178,14 +142,11 @@ sensor_value_t datamgr_get_avg(sensor_id_t sensor_id) {
     }
 
     sensor_value_t avg = sum / count;
-    fprintf(stderr, "Running average for sensor ID %" PRIu16 " is %.2f\n", sensor_id, avg);
     return avg;
 }
 
 // Get the last modified timestamp for a given sensor ID
 time_t datamgr_get_last_modified(sensor_id_t sensor_id) {
-    fprintf(stderr, "Getting last modified timestamp for sensor ID %" PRIu16 "\n", sensor_id);
-
     sensor_data_t temp_sensor;
     temp_sensor.id = sensor_id;
 
@@ -193,14 +154,5 @@ time_t datamgr_get_last_modified(sensor_id_t sensor_id) {
     ERROR_HANDLER(index == -1, "Sensor ID not found");
     sensor_data_t *sensor = (sensor_data_t *)dpl_get_element_at_index(sensor_list, index);
 
-    fprintf(stderr, "Last modified timestamp for sensor ID %" PRIu16 " is %ld\n", sensor_id, (long)sensor->ts);
     return sensor->ts;
-}
-
-// Get the total number of unique sensors
-int datamgr_get_total_sensors() {
-    fprintf(stderr, "Getting total number of sensors...\n");
-    int total_sensors = dpl_size(sensor_list);
-    fprintf(stderr, "Total number of sensors: %d\n", total_sensors);
-    return total_sensors;
 }

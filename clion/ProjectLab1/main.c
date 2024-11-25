@@ -4,8 +4,6 @@
 #include <time.h>
 
 int main() {
-    printf("Hello World\n");
-
     FILE *map = fopen("room_sensor.map", "r");
     FILE *data = fopen("sensor_data", "rb");
 
@@ -19,6 +17,8 @@ int main() {
         fclose(map);  // Close the already opened file
         return EXIT_FAILURE;
     }
+
+    datamgr_init();
 
     // Call the data manager function
     datamgr_parse_sensor_files(map, data);
