@@ -1,22 +1,39 @@
-all: test_server sensor_node
+# Targets to build both server and sensor node
+all: server sensor_node
 
-run: runserver
-
+# Clean up generated files
 clean:
-	rm test_server
-	rm sensor_node
+	rm -f server sensor_node
 
-test_server: test_server.c lib/tcpsock.c
-	gcc -g test_server.c lib/tcpsock.c -o test_server
+# Build the test server with main.c, server.c, and lib/tcpsock.c
+server: main.c server.c lib/tcpsock.c server.h
+	gcc -g main.c server.c lib/tcpsock.c -o server -lpthread
 
-sensor_node: sensor_node.c lib/tcpsock.c
+# Build the sensor node
+sensor_node: sensor_node.c lib/tcpsock.c lib/tcpsock.h config.h
 	gcc -g sensor_node.c lib/tcpsock.c -o sensor_node
 
-runserver: test_server
-	./test_server 5678 4
+# Run the server
+runserver: server
+	./server 5678 4
 
+# Run the first client
 runclient1: sensor_node
 	./sensor_node 1 2 127.0.0.1 5678
 
-runclient2: client
+# Run the second client
+runclient2: sensor_node
 	./sensor_node 2 5 127.0.0.1 5678
+
+# Run the second client
+runclient3: sensor_node
+	./sensor_node 3 2 127.0.0.1 5678
+
+# Run the second client
+runclient4: sensor_node
+	./sensor_node 4 2 127.0.0.1 5678
+
+# Run the second client
+runclient5: sensor_node
+	./sensor_node 5 1 127.0.0.1 5678
+

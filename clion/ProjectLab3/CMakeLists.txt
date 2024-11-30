@@ -3,4 +3,5 @@ project(ProjectLab3 C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(ProjectLab3 main.c)
+add_executable(ProjectLab3 main.c
+        server.h)
