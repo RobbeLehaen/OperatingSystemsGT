@@ -61,17 +61,17 @@ int sbuffer_free(sbuffer_t **buffer) {
     buf->tail = NULL;
     buf->size = 0;
 
+    pthread_cond_broadcast(&(buf->buffer_not_empty));  // Wake up any waiting threads
     pthread_mutex_unlock(&(buf->buffer_lock));
+
     pthread_mutex_destroy(&(buf->buffer_lock));
     pthread_cond_destroy(&(buf->buffer_not_empty));
-    pthread_cond_destroy(&(buf->buffer_not_full));
 
     free(buf);
     *buffer = NULL;
 
     return SBUFFER_SUCCESS;
 }
-
 
 // Insert data into the shared buffer
 int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
@@ -97,7 +97,8 @@ int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
     }
 
     buffer->size++;
-    pthread_cond_signal(&(buffer->buffer_not_empty));
+    pthread_cond_signal(&(buffer->buffer_not_empty));  // Notify waiting threads
+
     pthread_mutex_unlock(&(buffer->buffer_lock));
 
     return SBUFFER_SUCCESS;
@@ -108,8 +109,12 @@ int sbuffer_remove(sbuffer_t *buffer, sensor_data_t *data) {
     if (buffer == NULL || data == NULL) return SBUFFER_FAILURE;
 
     pthread_mutex_lock(&(buffer->buffer_lock));
+
     while (buffer->size == 0) {
-        pthread_cond_wait(&(buffer->buffer_not_empty), &(buffer->buffer_lock));
+        if (pthread_cond_wait(&(buffer->buffer_not_empty), &(buffer->buffer_lock)) != 0) {
+            pthread_mutex_unlock(&(buffer->buffer_lock));
+            return SBUFFER_FAILURE;  // Handle wait failure
+        }
     }
 
     struct sbuffer_node *node_to_remove = buffer->head;
@@ -127,4 +132,3 @@ int sbuffer_remove(sbuffer_t *buffer, sensor_data_t *data) {
 
     return SBUFFER_SUCCESS;
 }
-
