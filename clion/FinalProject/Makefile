@@ -60,8 +60,29 @@ clean:
 clean-all: clean
 	rm -rf lib/*.so
 
-run : sensor_gateway sensor_node
-	@echo "Add your own implementation here..."
+# Run the server
+runserver: sensor_gateway
+	./sensor_gateway 5678 4
+
+# Run the first client
+runclient1: sensor_node
+	./sensor_node 15 2 127.0.0.1 5678
+
+# Run the second client
+runclient2: sensor_node
+	./sensor_node 21 5 127.0.0.1 5678
+
+# Run the second client
+runclient3: sensor_node
+	./sensor_node 3 2 127.0.0.1 5678
+
+# Run the second client
+runclient4: sensor_node
+	./sensor_node 4 2 127.0.0.1 5678
+
+# Run the second client
+runclient5: sensor_node
+	./sensor_node 5 1 127.0.0.1 5678
 
 zip:
 	zip lab_final.zip main.c connmgr.c connmgr.h datamgr.c datamgr.h sbuffer.c sbuffer.h sensor_db.c sensor_db.h config.h lib/dplist.c lib/dplist.h lib/tcpsock.c lib/tcpsock.h Makefile

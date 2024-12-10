@@ -14,6 +14,7 @@ typedef time_t sensor_ts_t;         // UTC timestamp as returned by time() - not
 
 typedef struct {
     sensor_id_t id;
+    uint16_t room_id;
     sensor_value_t value;
     sensor_ts_t ts;
 } sensor_data_t;
