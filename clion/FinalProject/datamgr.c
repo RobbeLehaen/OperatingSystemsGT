@@ -1,4 +1,5 @@
 #include "datamgr.h"
+#include "connmgr.h"
 #include <inttypes.h>
 #include "lib/dplist.h"
 #include <stdlib.h>
@@ -77,7 +78,9 @@ void datamgr_free() {
 void datamgr_process_data(sensor_data_t *data) {
     int index = dpl_get_index_of_element(sensor_list, data);
     if (index == -1) {
-        fprintf(stderr, "Error: Sensor ID %u not found in map\n", data->id);
+        char log_msg[128];
+        snprintf(log_msg, sizeof(log_msg), "Received sensor data with invalid sensor node ID %" PRIu16, data->id);
+        write_log(log_msg);
         return;
     }
 
@@ -88,10 +91,13 @@ void datamgr_process_data(sensor_data_t *data) {
     double avg = datamgr_get_avg(sensor->id);
     fprintf(stdout, "Room %u: Sensor %u Running Avg = %.2f°C\n", sensor->room_id, sensor->id, avg);
 
+    char log_msg[128];
     if (avg < min_temp) {
-        fprintf(stderr, "Room %u (Sensor %u) is too cold! Avg Temp: %.2f°C\n", sensor->room_id, sensor->id, avg);
+        snprintf(log_msg, sizeof(log_msg), "Sensor node %" PRIu16 " reports it’s too cold (avg temp = %.2f)", sensor->id, avg);
+        write_log(log_msg);
     } else if (avg > max_temp) {
-        fprintf(stderr, "Room %u (Sensor %u) is too hot! Avg Temp: %.2f°C\n", sensor->room_id, sensor->id, avg);
+        snprintf(log_msg, sizeof(log_msg), "Sensor node %" PRIu16 " reports it’s too hot (avg temp = %.2f)", sensor->id, avg);
+        write_log(log_msg);
     }
 }
 

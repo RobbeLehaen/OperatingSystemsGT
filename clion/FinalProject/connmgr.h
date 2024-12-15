@@ -2,7 +2,10 @@
 #define CONNMGR_H
 
 #include "sbuffer.h"
-#include "lib/tcpsock.h"
+
+int init_logging();
+void write_log(const char *message);
+void cleanup_logging();
 
 /**
  * Initializes the connection manager.
