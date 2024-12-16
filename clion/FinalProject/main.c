@@ -15,6 +15,7 @@
 // Shared buffer for sensor data
 static sbuffer_t *shared_buffer = NULL;
 #define MAX_SENSORS 1000
+static volatile int program_running = 1;
 
 void *data_manager_thread(void *arg) {
     if (shared_buffer == NULL) {
@@ -33,7 +34,7 @@ void *data_manager_thread(void *arg) {
     datamgr_parse_sensor_files(room_sensor_map, NULL);
     fclose(room_sensor_map);
 
-    while (1) {
+    while (program_running == 1) {
         sensor_data_t *data;
         int result = sbuffer_peek(shared_buffer, &data);
 
@@ -50,6 +51,8 @@ void *data_manager_thread(void *arg) {
             nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
         }
     }
+    datamgr_free();
+    pthread_exit(NULL);
 }
 
 void *storage_manager_thread(void *arg) {
@@ -66,7 +69,7 @@ void *storage_manager_thread(void *arg) {
 
     write_log("Storage manager: A new data.csv file has been created.");
 
-    while (1) {
+    while (program_running == 1) {
         sensor_data_t *data;
         int result = sbuffer_peek(shared_buffer, &data);
 
@@ -93,6 +96,8 @@ void *storage_manager_thread(void *arg) {
             nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
         }
     }
+    close_csv(csv_file);
+    pthread_exit(NULL);
 }
 
 int main(int argc, char *argv[]) {
@@ -138,8 +143,8 @@ int main(int argc, char *argv[]) {
 
     write_log("Server shutting down");
 
-    pthread_cancel(data_manager_tid);
-    pthread_cancel(storage_manager_tid);
+    program_running = 0;
+
     pthread_join(data_manager_tid, NULL);
     pthread_join(storage_manager_tid, NULL);
 

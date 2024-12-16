@@ -18,20 +18,23 @@ static pid_t log_process_pid = -1;
 
 // Function to initialize logging
 int init_logging() {
+    // Create a pipe for communication
     if (pipe(log_pipe) == -1) {
         perror("Failed to create log pipe");
         return -1;
     }
 
+    // Fork the logger process
     log_process_pid = fork();
     if (log_process_pid == -1) {
         perror("Failed to fork logger process");
         return -1;
     }
 
-    if (log_process_pid == 0) { // Logger process
-        close(log_pipe[1]); // Close write end
+    if (log_process_pid == 0) { // Child process: Logger
+        close(log_pipe[1]); // Close the write end in the child process
 
+        // Open the log file
         FILE *log_file = fopen("gateway.log", "w");
         if (!log_file) {
             perror("Failed to open log file");
@@ -42,17 +45,31 @@ int init_logging() {
         char timestamp[128];
         int seq_num = 0;
 
+        // Logger process main loop
         while (1) {
             ssize_t bytes_read = read(log_pipe[0], buffer, BUFFER_SIZE - 1);
-            if (bytes_read <= 0) break; // Exit if pipe closed or error occurs
+            if (bytes_read <= 0) {
+                if (bytes_read == 0) { // EOF: Parent closed the write end
+                    break;
+                } else { // Other read errors
+                    perror("Logger process read error");
+                    break;
+                }
+            }
 
-            buffer[bytes_read] = '\0'; // Null-terminate buffer
+            buffer[bytes_read] = '\0'; // Null-terminate the buffer
 
+            // Check for termination message
+            if (strcmp(buffer, "EXIT") == 0) {
+                break;
+            }
+
+            // Generate a timestamp
             time_t now = time(NULL);
             struct tm *tm_info = localtime(&now);
             strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
 
-            // Process each line of the buffer
+            // Process each line in the buffer
             char *line = strtok(buffer, "\n");
             while (line != NULL) {
                 fprintf(log_file, "%d %s %s\n", seq_num++, timestamp, line);
@@ -61,11 +78,12 @@ int init_logging() {
             }
         }
 
+        // Clean up logger resources
         fclose(log_file);
         close(log_pipe[0]);
-        exit(EXIT_SUCCESS); // Clean exit for logger process
-    } else {
-        close(log_pipe[0]); // Parent process closes read end
+        exit(EXIT_SUCCESS); // Exit the logger process
+    } else { // Parent process
+        close(log_pipe[0]); // Close the read end in the parent process
         return 0;
     }
 }
@@ -85,9 +103,18 @@ void write_log(const char *message) {
 
 // Function to cleanup logging
 void cleanup_logging() {
-    close(log_pipe[1]);
-    waitpid(log_process_pid, NULL, 0);
-    log_process_pid = -1;
+    if (log_process_pid > 0) { // Only proceed if the logger process exists
+        // Signal the logger process to exit
+        const char *termination_message = "EXIT";
+        write(log_pipe[1], termination_message, strlen(termination_message));
+
+        // Close the write end of the pipe
+        close(log_pipe[1]);
+
+        // Wait for the logger process to exit
+        int status;
+        waitpid(log_process_pid, &status, 0);
+    }
 }
 
 
@@ -129,16 +156,12 @@ void connmgr_cleanup() {
 }
 
 
-// Handle a single client connection
 void *handle_client(void *arg) {
     tcpsock_t *client = (tcpsock_t *)arg;
     sensor_data_t data = {0};
     int bytes, result;
-
-    // Log the opening of the connection
+    int first_message = 1;
     char log_msg[128];
-    snprintf(log_msg, sizeof(log_msg), "Sensor node %" PRIu16 " has opened a new connection", data.id);
-    write_log(log_msg);
 
     printf("Handling new client connection\n");
 
@@ -157,6 +180,13 @@ void *handle_client(void *arg) {
 
         printf("Received data: Sensor ID = %" PRIu16 ", Value = %.2f, Timestamp = %ld\n",
                data.id, data.value, (long int)data.ts);
+
+        // Log the opening of the connection only for the first message
+        if (first_message) {
+            snprintf(log_msg, sizeof(log_msg), "Sensor node %" PRIu16 " has opened a new connection", data.id);
+            write_log(log_msg);
+            first_message = 0;
+        }
 
         if (sbuffer_insert(shared_buffer, &data) != SBUFFER_SUCCESS) {
             fprintf(stderr, "Failed to insert data into shared buffer\n");

@@ -1,47 +1,46 @@
-0 2024-12-16 16:12:27 Server started
-1 2024-12-16 16:12:27 A new data.csv file has been created.
-2 2024-12-16 16:12:27 Storage manager: A new data.csv file has been created.
-3 2024-12-16 16:12:30 Sensor node 0 has opened a new connection
-4 2024-12-16 16:12:31 Data insertion from sensor 15
-5 2024-12-16 16:12:32 Data insertion from sensor 15
-6 2024-12-16 16:12:32 Sensor node 0 has opened a new connection
-7 2024-12-16 16:12:32 Data insertion from sensor 15
-8 2024-12-16 16:12:32 Data insertion from sensor 21
-9 2024-12-16 16:12:33 Sensor node 15 reports it’s too hot (avg temp = 20.10)
-10 2024-12-16 16:12:33 Data insertion from sensor 15
-11 2024-12-16 16:12:34 Sensor node 0 has opened a new connection
-12 2024-12-16 16:12:34 Sensor node 15 reports it’s too hot (avg temp = 20.09)
-13 2024-12-16 16:12:34 Data insertion from sensor 15
-14 2024-12-16 16:12:34 Sensor node 37 reports it’s too hot (avg temp = 20.14)
-15 2024-12-16 16:12:35 Data insertion from sensor 37
-16 2024-12-16 16:12:35 Sensor node 15 reports it’s too hot (avg temp = 20.11)
-17 2024-12-16 16:12:36 Data insertion from sensor 15
-18 2024-12-16 16:12:37 Data insertion from sensor 21
-19 2024-12-16 16:12:37 Sensor node 15 reports it’s too hot (avg temp = 20.07)
-20 2024-12-16 16:12:37 Data insertion from sensor 15
-21 2024-12-16 16:12:37 Data insertion from sensor 37
-22 2024-12-16 16:12:38 Sensor node 15 reports it’s too hot (avg temp = 20.12)
-23 2024-12-16 16:12:38 Data insertion from sensor 15
-24 2024-12-16 16:12:39 Sensor node 37 reports it’s too hot (avg temp = 20.12)
-25 2024-12-16 16:12:39 Data insertion from sensor 37
-26 2024-12-16 16:12:39 Sensor node 15 reports it’s too hot (avg temp = 20.10)
-27 2024-12-16 16:12:40 Data insertion from sensor 15
-28 2024-12-16 16:12:41 Data insertion from sensor 21
-29 2024-12-16 16:12:41 Data insertion from sensor 15
-30 2024-12-16 16:12:41 Data insertion from sensor 15
-31 2024-12-16 16:12:41 Sensor node 37 reports it’s too hot (avg temp = 20.16)
-32 2024-12-16 16:12:41 Data insertion from sensor 37
-33 2024-12-16 16:12:43 Data insertion from sensor 21
-34 2024-12-16 16:12:43 Data insertion from sensor 15
-35 2024-12-16 16:12:43 Sensor node 37 reports it’s too hot (avg temp = 20.12)
-36 2024-12-16 16:12:43 Data insertion from sensor 37
-37 2024-12-16 16:12:43 Sensor node 15 reports it’s too hot (avg temp = 20.11)
-38 2024-12-16 16:12:43 Data insertion from sensor 15
-39 2024-12-16 16:12:44 Sensor node 15 reports it’s too hot (avg temp = 20.07)
-40 2024-12-16 16:12:44 Data insertion from sensor 15
-41 2024-12-16 16:12:46 Data insertion from sensor 21
-42 2024-12-16 16:12:46 Sensor node 37 reports it’s too hot (avg temp = 20.07)
-43 2024-12-16 16:12:46 Sensor node 15 has closed the connection
-44 2024-12-16 16:12:46 Sensor node 37 has closed the connection
-45 2024-12-16 16:12:46 Sensor node 21 has closed the connection
-46 2024-12-16 16:12:46 Server shutting down
+0 2024-12-16 17:44:42 Server started
+1 2024-12-16 17:44:42 A new data.csv file has been created.
+2 2024-12-16 17:44:42 Storage manager: A new data.csv file has been created.
+3 2024-12-16 17:44:45 Sensor node 15 has opened a new connection
+4 2024-12-16 17:44:45 Data insertion from sensor 15
+5 2024-12-16 17:44:46 Data insertion from sensor 15
+6 2024-12-16 17:44:47 Sensor node 21 has opened a new connection
+7 2024-12-16 17:44:47 Data insertion from sensor 15
+8 2024-12-16 17:44:47 Sensor node 21 reports it’s too hot (avg temp = 20.21)
+9 2024-12-16 17:44:48 Data insertion from sensor 21
+10 2024-12-16 17:44:48 Data insertion from sensor 15
+11 2024-12-16 17:44:49 Sensor node 37 has opened a new connection
+12 2024-12-16 17:44:49 Data insertion from sensor 15
+13 2024-12-16 17:44:49 Sensor node 37 reports it’s too hot (avg temp = 20.08)
+14 2024-12-16 17:44:49 Data insertion from sensor 37
+15 2024-12-16 17:44:50 Data insertion from sensor 15
+16 2024-12-16 17:44:50 Sensor node 21 reports it’s too hot (avg temp = 20.25)
+17 2024-12-16 17:44:50 Data insertion from sensor 21
+18 2024-12-16 17:44:51 Data insertion from sensor 15
+19 2024-12-16 17:44:51 Sensor node 37 reports it’s too hot (avg temp = 20.33)
+20 2024-12-16 17:44:51 Data insertion from sensor 37
+21 2024-12-16 17:44:52 Data insertion from sensor 15
+22 2024-12-16 17:44:53 Sensor node 21 reports it’s too hot (avg temp = 20.35)
+23 2024-12-16 17:44:53 Data insertion from sensor 21
+24 2024-12-16 17:44:53 Data insertion from sensor 15
+25 2024-12-16 17:44:53 Sensor node 37 reports it’s too hot (avg temp = 20.16)
+26 2024-12-16 17:44:53 Data insertion from sensor 37
+27 2024-12-16 17:44:54 Data insertion from sensor 15
+28 2024-12-16 17:44:55 Sensor node 37 reports it’s too hot (avg temp = 20.04)
+29 2024-12-16 17:44:55 Data insertion from sensor 37
+30 2024-12-16 17:44:55 Data insertion from sensor 15
+31 2024-12-16 17:44:56 Sensor node 21 reports it’s too hot (avg temp = 20.26)
+32 2024-12-16 17:44:56 Data insertion from sensor 21
+33 2024-12-16 17:44:56 Data insertion from sensor 15
+34 2024-12-16 17:44:57 Data insertion from sensor 37
+35 2024-12-16 17:44:58 Data insertion from sensor 15
+36 2024-12-16 17:44:58 Data insertion from sensor 15
+37 2024-12-16 17:44:59 Sensor node 21 reports it’s too hot (avg temp = 20.03)
+38 2024-12-16 17:44:59 Data insertion from sensor 21
+39 2024-12-16 17:44:59 Data insertion from sensor 37
+40 2024-12-16 17:45:00 Data insertion from sensor 15
+41 2024-12-16 17:45:00 Sensor node 15 has closed the connection
+42 2024-12-16 17:45:00 Sensor node 37 has closed the connection
+43 2024-12-16 17:45:00 Sensor node 21 has closed the connection
+44 2024-12-16 17:45:00 Server shutting down
+45 2024-12-16 17:45:00 The data.csv file has been closed.
