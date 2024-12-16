@@ -2,6 +2,9 @@
 #include <pthread.h>
 #include "sbuffer.h"
 #include "config.h"
+#include "connmgr.h"
+#include <inttypes.h>
+#include <stdio.h>
 
 struct sbuffer_node {
     sensor_data_t data;
@@ -13,7 +16,6 @@ struct sbuffer {
     struct sbuffer_node *tail;
     pthread_mutex_t buffer_lock;
     pthread_cond_t buffer_not_empty;
-    pthread_cond_t buffer_not_full;
     size_t size;
 };
 
@@ -86,6 +88,7 @@ int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
     }
 
     new_node->data = *data;
+    new_node->data.processed = 0;
     new_node->next = NULL;
 
     if (buffer->tail == NULL) {
@@ -97,12 +100,13 @@ int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
     }
 
     buffer->size++;
-    pthread_cond_signal(&(buffer->buffer_not_empty));  // Notify waiting threads
+    pthread_cond_signal(&(buffer->buffer_not_empty));
 
     pthread_mutex_unlock(&(buffer->buffer_lock));
 
     return SBUFFER_SUCCESS;
 }
+
 
 // Remove data from the shared buffer
 int sbuffer_remove(sbuffer_t *buffer, sensor_data_t *data) {
@@ -113,7 +117,7 @@ int sbuffer_remove(sbuffer_t *buffer, sensor_data_t *data) {
     while (buffer->size == 0) {
         if (pthread_cond_wait(&(buffer->buffer_not_empty), &(buffer->buffer_lock)) != 0) {
             pthread_mutex_unlock(&(buffer->buffer_lock));
-            return SBUFFER_FAILURE;  // Handle wait failure
+            return SBUFFER_FAILURE;
         }
     }
 
@@ -130,5 +134,23 @@ int sbuffer_remove(sbuffer_t *buffer, sensor_data_t *data) {
 
     pthread_mutex_unlock(&(buffer->buffer_lock));
 
+    return SBUFFER_SUCCESS;
+}
+
+int sbuffer_peek(sbuffer_t *buffer, sensor_data_t **data) {
+    if (buffer == NULL || data == NULL) {
+        return SBUFFER_FAILURE;
+    }
+
+    pthread_mutex_lock(&(buffer->buffer_lock));
+
+    if (buffer->size == 0) {
+        pthread_mutex_unlock(&(buffer->buffer_lock));
+        return SBUFFER_EMPTY;
+    }
+
+    *data = &(buffer->head->data);
+
+    pthread_mutex_unlock(&(buffer->buffer_lock));
     return SBUFFER_SUCCESS;
 }

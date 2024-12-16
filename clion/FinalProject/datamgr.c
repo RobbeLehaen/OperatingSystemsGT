@@ -75,13 +75,13 @@ void datamgr_free() {
     dpl_free(&sensor_list, true);
 }
 
-void datamgr_process_data(sensor_data_t *data) {
+int datamgr_process_data(sensor_data_t *data) {
     int index = dpl_get_index_of_element(sensor_list, data);
     if (index == -1) {
         char log_msg[128];
         snprintf(log_msg, sizeof(log_msg), "Received sensor data with invalid sensor node ID %" PRIu16, data->id);
         write_log(log_msg);
-        return;
+        return DATAMGR_FAILURE;
     }
 
     sensor_data_t *sensor = (sensor_data_t *)dpl_get_element_at_index(sensor_list, index);
@@ -99,6 +99,8 @@ void datamgr_process_data(sensor_data_t *data) {
         snprintf(log_msg, sizeof(log_msg), "Sensor node %" PRIu16 " reports it’s too hot (avg temp = %.2f)", sensor->id, avg);
         write_log(log_msg);
     }
+
+    return DATAMGR_SUCCESS;
 }
 
 sensor_value_t datamgr_get_avg(sensor_id_t sensor_id) {

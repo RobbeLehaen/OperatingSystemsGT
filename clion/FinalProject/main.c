@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 199309L
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -13,61 +14,81 @@
 
 // Shared buffer for sensor data
 static sbuffer_t *shared_buffer = NULL;
+#define MAX_SENSORS 1000
 
 void *data_manager_thread(void *arg) {
-    FILE *room_sensor_map = fopen("room_sensor.map", "r");
-    if (room_sensor_map == NULL) {
-        perror("Error opening room_sensor.map");
+    if (shared_buffer == NULL) {
+        write_log("Data manager: Received NULL buffer pointer. Exiting thread.");
         pthread_exit(NULL);
     }
 
     datamgr_init();
+    FILE *room_sensor_map = fopen("room_sensor.map", "r");
+    if (room_sensor_map == NULL) {
+        write_log("Data manager: Failed to open room_sensor.map. Exiting.");
+        datamgr_free();
+        pthread_exit(NULL);
+    }
+
     datamgr_parse_sensor_files(room_sensor_map, NULL);
     fclose(room_sensor_map);
 
     while (1) {
-        sensor_data_t data;
-        if (sbuffer_remove(shared_buffer, &data) == SBUFFER_SUCCESS) {
-            datamgr_process_data(&data);
+        sensor_data_t *data;
+        int result = sbuffer_peek(shared_buffer, &data);
+
+        if (result == SBUFFER_SUCCESS) {
+            if (data->processed == 0) {
+                if (datamgr_process_data(data) == 0) {
+                    data->processed = 1;
+                }
+            }
+        } else if (result == SBUFFER_EMPTY) {
+            nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
         } else {
-            write_log("Data manager: Buffer is empty, retrying...");
-            sleep(1); // Wait before retrying
+            write_log("Data manager: Failed to peek data.");
+            nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
         }
     }
-
-    datamgr_free();
-    pthread_exit(NULL);
 }
 
 void *storage_manager_thread(void *arg) {
-    sbuffer_t *shared_buffer = (sbuffer_t *)arg;
-
-    FILE *csv_file = open_csv(false);
-    if (!csv_file) {
-        write_log("Storage manager: Failed to initialize");
+    if (shared_buffer == NULL) {
+        write_log("Storage manager: Received NULL buffer pointer. Exiting thread.");
         pthread_exit(NULL);
     }
 
-    write_log("Storage manager: A new data.csv file has been created");
-
-    while (1) {
-        sensor_data_t data;
-        if (sbuffer_remove(shared_buffer, &data) == SBUFFER_SUCCESS) {
-            if (write_to_csv(csv_file, data.id, data.value, data.ts) == 0) {
-                char log_msg[128];
-                snprintf(log_msg, sizeof(log_msg), "Storage manager: Data from sensor %" PRIu16 " inserted successfully", data.id);
-                write_log(log_msg);
-            } else {
-                write_log("Storage manager: Failed to insert data");
-            }
-        } else {
-            sleep(1); // Wait before retrying
-        }
+    FILE *csv_file = open_csv(false);
+    if (!csv_file) {
+        write_log("Storage manager: Failed to initialize CSV file.");
+        pthread_exit(NULL);
     }
 
-    write_log("Storage manager: Closing data.csv file");
-    close_csv(csv_file);
-    pthread_exit(NULL);
+    write_log("Storage manager: A new data.csv file has been created.");
+
+    while (1) {
+        sensor_data_t *data;
+        int result = sbuffer_peek(shared_buffer, &data);
+
+        if (result == SBUFFER_SUCCESS) {
+            if (data->processed == 1) {
+                if (write_to_csv(csv_file, data->id, data->value, data->ts) == -1) {
+                    write_log("Storage manager: Failed to write data to CSV.");
+                }
+
+                if (sbuffer_remove(shared_buffer, data) == SBUFFER_FAILURE) {
+                    write_log("Storage manager: Failed to remove data from buffer.");
+                }
+            } else {
+                nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
+            }
+        } else if (result == SBUFFER_EMPTY) {
+            nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
+        } else {
+            write_log("Storage manager: Failed to peek data from buffer due to an unexpected error.");
+            nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -98,7 +119,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    if (pthread_create(&storage_manager_tid, NULL, storage_manager_thread, (void *)shared_buffer) != 0) {
+    if (pthread_create(&storage_manager_tid, NULL, storage_manager_thread, NULL) != 0) {
         perror("Error creating storage manager thread");
         exit(EXIT_FAILURE);
     }

@@ -17,6 +17,7 @@ typedef struct {
     uint16_t room_id;
     sensor_value_t value;
     sensor_ts_t ts;
+    int processed;
 } sensor_data_t;
 
 #endif /* _CONFIG_H_ */

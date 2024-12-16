@@ -64,9 +64,14 @@ int init_logging() {
 // Function to write log messages
 void write_log(const char *message) {
     pthread_mutex_lock(&log_mutex);
-    write(log_pipe[1], message, strlen(message));
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "%s\n", message);
+    write(log_pipe[1], buffer, strlen(buffer));
+
     pthread_mutex_unlock(&log_mutex);
 }
+
 
 // Function to cleanup logging
 void cleanup_logging() {
