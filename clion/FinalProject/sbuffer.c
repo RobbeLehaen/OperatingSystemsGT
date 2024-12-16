@@ -109,7 +109,7 @@ int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
 
 
 // Remove data from the shared buffer
-int sbuffer_remove(sbuffer_t *buffer, sensor_data_t *data) {
+int sbuffer_remove(sbuffer_t *buffer, sensor_data_t **data) {
     if (buffer == NULL || data == NULL) return SBUFFER_FAILURE;
 
     pthread_mutex_lock(&(buffer->buffer_lock));
@@ -122,14 +122,24 @@ int sbuffer_remove(sbuffer_t *buffer, sensor_data_t *data) {
     }
 
     struct sbuffer_node *node_to_remove = buffer->head;
-    *data = node_to_remove->data;
 
+    // Allocate memory for the data being removed
+    *data = malloc(sizeof(sensor_data_t));
+    if (*data == NULL) {
+        pthread_mutex_unlock(&(buffer->buffer_lock));
+        return SBUFFER_FAILURE;
+    }
+
+    // Copy data from the node
+    **data = node_to_remove->data;
+
+    // Update the head of the buffer
     buffer->head = node_to_remove->next;
     if (buffer->head == NULL) {
         buffer->tail = NULL;
     }
 
-    free(node_to_remove);
+    free(node_to_remove); // Free the buffer node itself
     buffer->size--;
 
     pthread_mutex_unlock(&(buffer->buffer_lock));

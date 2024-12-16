@@ -76,9 +76,13 @@ void *storage_manager_thread(void *arg) {
                     write_log("Storage manager: Failed to write data to CSV.");
                 }
 
-                if (sbuffer_remove(shared_buffer, data) == SBUFFER_FAILURE) {
+                if (sbuffer_remove(shared_buffer, &data) == SBUFFER_FAILURE) {
                     write_log("Storage manager: Failed to remove data from buffer.");
+                } else {
+                    free(data);
                 }
+
+
             } else {
                 nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
             }
