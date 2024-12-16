@@ -8,43 +8,13 @@
 #include "sbuffer.h"
 #include <unistd.h>
 #include <time.h>
+#include <sys/wait.h>
 
-#define LOG_BUFFER_SIZE 1024
+#define BUFFER_SIZE 1024
 
-// Global variables for logging
 static int log_pipe[2];
 static pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_t log_thread;
-
-// Logging thread function
-void *log_thread_func(void *arg) {
-    FILE *log_file = fopen("gateway.log", "w");
-    if (!log_file) {
-        perror("Failed to open gateway.log");
-        pthread_exit(NULL);
-    }
-
-    char buffer[LOG_BUFFER_SIZE];
-    char timestamp[128];
-    int seq_num = 0;
-
-    while (1) {
-        ssize_t bytes_read = read(log_pipe[0], buffer, LOG_BUFFER_SIZE - 1);
-        if (bytes_read <= 0) break; // Pipe closed or error occurred
-
-        buffer[bytes_read] = '\0'; // Null-terminate the buffer
-
-        time_t now = time(NULL);
-        struct tm *tm_info = localtime(&now);
-        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
-
-        fprintf(log_file, "%d %s %s\n", seq_num++, timestamp, buffer);
-        fflush(log_file);
-    }
-
-    fclose(log_file);
-    pthread_exit(NULL);
-}
+static pid_t log_process_pid = -1;
 
 // Function to initialize logging
 int init_logging() {
@@ -53,19 +23,59 @@ int init_logging() {
         return -1;
     }
 
-    if (pthread_create(&log_thread, NULL, log_thread_func, NULL) != 0) {
-        perror("Failed to create log thread");
+    log_process_pid = fork();
+    if (log_process_pid == -1) {
+        perror("Failed to fork logger process");
         return -1;
     }
 
-    return 0;
+    if (log_process_pid == 0) { // Logger process
+        close(log_pipe[1]); // Close write end
+
+        FILE *log_file = fopen("gateway.log", "w");
+        if (!log_file) {
+            perror("Failed to open log file");
+            exit(EXIT_FAILURE);
+        }
+
+        char buffer[BUFFER_SIZE];
+        char timestamp[128];
+        int seq_num = 0;
+
+        while (1) {
+            ssize_t bytes_read = read(log_pipe[0], buffer, BUFFER_SIZE - 1);
+            if (bytes_read <= 0) break; // Exit if pipe closed or error occurs
+
+            buffer[bytes_read] = '\0'; // Null-terminate buffer
+
+            time_t now = time(NULL);
+            struct tm *tm_info = localtime(&now);
+            strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
+
+            // Process each line of the buffer
+            char *line = strtok(buffer, "\n");
+            while (line != NULL) {
+                fprintf(log_file, "%d %s %s\n", seq_num++, timestamp, line);
+                fflush(log_file); // Flush immediately for real-time logs
+                line = strtok(NULL, "\n");
+            }
+        }
+
+        fclose(log_file);
+        close(log_pipe[0]);
+        exit(EXIT_SUCCESS); // Clean exit for logger process
+    } else {
+        close(log_pipe[0]); // Parent process closes read end
+        return 0;
+    }
 }
+
 
 // Function to write log messages
 void write_log(const char *message) {
     pthread_mutex_lock(&log_mutex);
 
-    char buffer[1024];
+    char buffer[BUFFER_SIZE];
     snprintf(buffer, sizeof(buffer), "%s\n", message);
     write(log_pipe[1], buffer, strlen(buffer));
 
@@ -75,10 +85,11 @@ void write_log(const char *message) {
 
 // Function to cleanup logging
 void cleanup_logging() {
-    close(log_pipe[1]); // Close write end of the pipe
-    pthread_join(log_thread, NULL);
-    close(log_pipe[0]); // Close read end of the pipe
+    close(log_pipe[1]);
+    waitpid(log_process_pid, NULL, 0);
+    log_process_pid = -1;
 }
+
 
 // Server state structure
 typedef struct connmgr_state {
