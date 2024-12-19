@@ -68,6 +68,7 @@ void datamgr_parse_sensor_files(FILE *fp_sensor_map, FILE *fp_sensor_data) {
         sensor->ts = 0;
 
         dpl_insert_at_index(sensor_list, sensor, dpl_size(sensor_list), true);
+        free(sensor);
     }
 }
 

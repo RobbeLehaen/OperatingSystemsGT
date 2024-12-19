@@ -14,6 +14,7 @@
 
 // Shared buffer for sensor data
 static sbuffer_t *shared_buffer = NULL;
+static pthread_mutex_t buffer_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define MAX_SENSORS 1000
 static volatile int program_running = 1;
 
@@ -35,23 +36,25 @@ void *data_manager_thread(void *arg) {
     fclose(room_sensor_map);
 
     while (program_running == 1) {
-        sensor_data_t *data;
+        sensor_data_t *data = NULL;
+        pthread_mutex_lock(&buffer_mutex);
         int result = sbuffer_peek(shared_buffer, &data);
-
-        if (result == SBUFFER_SUCCESS) {
+        if (result == SBUFFER_SUCCESS && data) {
             if (data->processed == 0) {
                 if (datamgr_process_data(data) == 0) {
                     data->processed = 1;
                 }
             }
-        } else if (result == SBUFFER_EMPTY) {
+        }
+        pthread_mutex_unlock(&buffer_mutex);
+
+        if (result == SBUFFER_EMPTY) {
             nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
-        } else {
+        } else if (result != SBUFFER_SUCCESS) {
             write_log("Data manager: Failed to peek data.");
             nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
         }
     }
-    datamgr_free();
     pthread_exit(NULL);
 }
 
@@ -70,29 +73,27 @@ void *storage_manager_thread(void *arg) {
     write_log("Storage manager: A new data.csv file has been created.");
 
     while (program_running == 1) {
-        sensor_data_t *data;
+        sensor_data_t *data = NULL;
+        pthread_mutex_lock(&buffer_mutex);
         int result = sbuffer_peek(shared_buffer, &data);
-
-        if (result == SBUFFER_SUCCESS) {
-            if (data->processed == 1) {
-                if (write_to_csv(csv_file, data->id, data->value, data->ts) == -1) {
-                    write_log("Storage manager: Failed to write data to CSV.");
-                }
-
-                if (sbuffer_remove(shared_buffer, &data) == SBUFFER_FAILURE) {
-                    write_log("Storage manager: Failed to remove data from buffer.");
-                } else {
-                    free(data);
-                }
-
-
-            } else {
-                nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
+        if (result == SBUFFER_SUCCESS && data && data->processed == 1) {
+            if (write_to_csv(csv_file, data->id, data->value, data->ts) == -1) {
+                write_log("Storage manager: Failed to write data to CSV.");
             }
-        } else if (result == SBUFFER_EMPTY) {
+
+            if (sbuffer_remove(shared_buffer, &data) == SBUFFER_SUCCESS) {
+                free(data);
+                data = NULL;
+            } else {
+                write_log("Storage manager: Failed to remove data from buffer.");
+            }
+        }
+        pthread_mutex_unlock(&buffer_mutex);
+
+        if (result == SBUFFER_EMPTY ) {
             nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
-        } else {
-            write_log("Storage manager: Failed to peek data from buffer due to an unexpected error.");
+        } else if (result != SBUFFER_SUCCESS) {
+            write_log("Storage manager: Unexpected error.");
             nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
         }
     }
@@ -140,6 +141,8 @@ int main(int argc, char *argv[]) {
 
     connmgr_listen();
     connmgr_cleanup();
+
+    datamgr_free();
 
     write_log("Server shutting down");
 
