@@ -81,6 +81,15 @@ int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
 
     pthread_mutex_lock(&(buffer->buffer_lock));
 
+    struct sbuffer_node *current = buffer->head;
+    while (current) {
+        if (current->data.id == data->id && current->data.ts == data->ts) {
+            pthread_mutex_unlock(&(buffer->buffer_lock));
+            return SBUFFER_DUPLICATE;
+        }
+        current = current->next;
+    }
+
     struct sbuffer_node *new_node = malloc(sizeof(struct sbuffer_node));
     if (new_node == NULL) {
         pthread_mutex_unlock(&(buffer->buffer_lock));

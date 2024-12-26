@@ -35,13 +35,13 @@ void *data_manager_thread(void *arg) {
     datamgr_parse_sensor_files(room_sensor_map, NULL);
     fclose(room_sensor_map);
 
-    while (program_running == 1) {
+    while (program_running) {
         sensor_data_t *data = NULL;
         pthread_mutex_lock(&buffer_mutex);
         int result = sbuffer_peek(shared_buffer, &data);
         if (result == SBUFFER_SUCCESS && data) {
             if (data->processed == 0) {
-                if (datamgr_process_data(data) == 0) {
+                if (datamgr_process_data(data) == DATAMGR_SUCCESS) {
                     data->processed = 1;
                 }
             }
@@ -72,25 +72,28 @@ void *storage_manager_thread(void *arg) {
 
     write_log("Storage manager: A new data.csv file has been created.");
 
-    while (program_running == 1) {
+    while (program_running) {
         sensor_data_t *data = NULL;
         pthread_mutex_lock(&buffer_mutex);
         int result = sbuffer_peek(shared_buffer, &data);
-        if (result == SBUFFER_SUCCESS && data && data->processed == 1) {
-            if (write_to_csv(csv_file, data->id, data->value, data->ts) == -1) {
-                write_log("Storage manager: Failed to write data to CSV.");
+        if (result == SBUFFER_SUCCESS && data) {
+            if (data->processed == 1) { // Processed by data manager
+                if (write_to_csv(csv_file, data->id, data->value, data->ts) == 0) {
+                    data->processed = 2;
+                }
             }
-
-            if (sbuffer_remove(shared_buffer, &data) == SBUFFER_SUCCESS) {
-                free(data);
-                data = NULL;
-            } else {
-                write_log("Storage manager: Failed to remove data from buffer.");
+            if (data->processed == 2) {
+                if (sbuffer_remove(shared_buffer, &data) == SBUFFER_SUCCESS) {
+                    free(data);
+                    data = NULL;
+                } else {
+                    write_log("Storage manager: Failed to remove data from buffer.");
+                }
             }
         }
         pthread_mutex_unlock(&buffer_mutex);
 
-        if (result == SBUFFER_EMPTY ) {
+        if (result == SBUFFER_EMPTY) {
             nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 100000000}, NULL);
         } else if (result != SBUFFER_SUCCESS) {
             write_log("Storage manager: Unexpected error.");
@@ -140,11 +143,11 @@ int main(int argc, char *argv[]) {
     }
 
     connmgr_listen();
+
+    write_log("Server shutting down");
     connmgr_cleanup();
 
     datamgr_free();
-
-    write_log("Server shutting down");
 
     program_running = 0;
 
@@ -153,6 +156,6 @@ int main(int argc, char *argv[]) {
 
     cleanup_logging();
     sbuffer_free(&shared_buffer);
-
+    fprintf(stderr, "Server shutdown complete\n");
     return EXIT_SUCCESS;
 }

@@ -11,6 +11,7 @@
 #define SBUFFER_SUCCESS 0
 #define SBUFFER_NO_DATA 1
 #define SBUFFER_EMPTY 2
+#define SBUFFER_DUPLICATE 3
 
 typedef struct sbuffer sbuffer_t;
 

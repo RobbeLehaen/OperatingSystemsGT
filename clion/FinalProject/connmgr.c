@@ -103,15 +103,12 @@ void write_log(const char *message) {
 
 // Function to cleanup logging
 void cleanup_logging() {
-    if (log_process_pid > 0) { // Only proceed if the logger process exists
-        // Signal the logger process to exit
+    if (log_process_pid > 0) {
         const char *termination_message = "EXIT";
         write(log_pipe[1], termination_message, strlen(termination_message));
 
-        // Close the write end of the pipe
         close(log_pipe[1]);
 
-        // Wait for the logger process to exit
         int status;
         waitpid(log_process_pid, &status, 0);
     }
@@ -162,8 +159,6 @@ void *handle_client(void *arg) {
     int bytes, result;
     int first_message = 1;
     char log_msg[128];
-
-    printf("Handling new client connection\n");
 
     do {
         bytes = sizeof(data.id);
