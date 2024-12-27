@@ -26,11 +26,11 @@ void *copy_sensor_data(void *element) {
 
     sensor_data_t *copy = malloc(sizeof(sensor_data_t));
     if (copy == NULL) {
-        perror("Memory allocation failed for sensor data copy");
+        write_log("Memory allocation failed for sensor data copy");
         exit(EXIT_FAILURE);
     }
 
-    *copy = *(sensor_data_t *)element; // Deep copy
+    *copy = *(sensor_data_t *)element;
     return copy;
 }
 
@@ -44,14 +44,14 @@ void free_sensor_data(void **element) {
 void datamgr_init() {
     sensor_list = dpl_create(copy_sensor_data, free_sensor_data, element_compare);
     if (sensor_list == NULL) {
-        fprintf(stderr, "Failed to create sensor list.\n");
+        write_log("Failed to create sensor list.\n");
         exit(1);
     }
 }
 
 void datamgr_parse_sensor_files(FILE *fp_sensor_map, FILE *fp_sensor_data) {
     if (fp_sensor_map == NULL) {
-        fprintf(stderr, "Sensor map file could not be opened\n");
+        write_log("Sensor map file could not be opened\n");
         exit(EXIT_FAILURE);
     }
 
@@ -59,7 +59,7 @@ void datamgr_parse_sensor_files(FILE *fp_sensor_map, FILE *fp_sensor_data) {
     while (fscanf(fp_sensor_map, "%u %u\n", (unsigned int *)&room_id, (unsigned int *)&sensor_id) == 2) {
         sensor_data_t *sensor = malloc(sizeof(sensor_data_t));
         if (sensor == NULL) {
-            fprintf(stderr, "Error: Memory allocation failed for sensor data\n");
+            write_log("Error: Memory allocation failed for sensor data\n");
             exit(EXIT_FAILURE);
         }
         sensor->room_id = room_id;

@@ -31,8 +31,8 @@ int init_logging() {
         return -1;
     }
 
-    if (log_process_pid == 0) { // Child process: Logger
-        close(log_pipe[1]); // Close the write end in the child process
+    if (log_process_pid == 0) {
+        close(log_pipe[1]);
 
         // Open the log file
         FILE *log_file = fopen("gateway.log", "w");
@@ -49,15 +49,15 @@ int init_logging() {
         while (1) {
             ssize_t bytes_read = read(log_pipe[0], buffer, BUFFER_SIZE - 1);
             if (bytes_read <= 0) {
-                if (bytes_read == 0) { // EOF: Parent closed the write end
+                if (bytes_read == 0) {
                     break;
-                } else { // Other read errors
+                } else {
                     perror("Logger process read error");
                     break;
                 }
             }
 
-            buffer[bytes_read] = '\0'; // Null-terminate the buffer
+            buffer[bytes_read] = '\0';
 
             // Check for termination message
             if (strcmp(buffer, "EXIT") == 0) {
@@ -73,7 +73,7 @@ int init_logging() {
             char *line = strtok(buffer, "\n");
             while (line != NULL) {
                 fprintf(log_file, "%d %s %s\n", seq_num++, timestamp, line);
-                fflush(log_file); // Flush immediately for real-time logs
+                fflush(log_file);
                 line = strtok(NULL, "\n");
             }
         }
@@ -81,9 +81,9 @@ int init_logging() {
         // Clean up logger resources
         fclose(log_file);
         close(log_pipe[0]);
-        exit(EXIT_SUCCESS); // Exit the logger process
-    } else { // Parent process
-        close(log_pipe[0]); // Close the read end in the parent process
+        exit(EXIT_SUCCESS);
+    } else {
+        close(log_pipe[0]);
         return 0;
     }
 }
@@ -149,7 +149,7 @@ void connmgr_cleanup() {
     state.server_running = 0;
     tcp_close(&state.server_socket);
     pthread_mutex_destroy(&state.conn_mutex);
-    printf("Connection manager resources cleaned up.\n");
+    write_log("Connection manager resources cleaned up.\n");
 }
 
 
@@ -158,42 +158,54 @@ void *handle_client(void *arg) {
     sensor_data_t data = {0};
     int bytes, result;
     int first_message = 1;
-    char log_msg[128];
+    char log_msg[256];
 
     do {
+        // Receive Sensor ID
         bytes = sizeof(data.id);
         result = tcp_receive(client, (void *)&data.id, &bytes);
         if (result != TCP_NO_ERROR || bytes == 0) break;
 
+        // Receive Sensor Value
         bytes = sizeof(data.value);
         result = tcp_receive(client, (void *)&data.value, &bytes);
         if (result != TCP_NO_ERROR || bytes == 0) break;
 
+        // Receive Sensor Timestamp
         bytes = sizeof(data.ts);
         result = tcp_receive(client, (void *)&data.ts, &bytes);
         if (result != TCP_NO_ERROR || bytes == 0) break;
 
-        printf("Received data: Sensor ID = %" PRIu16 ", Value = %.2f, Timestamp = %ld\n",
-               data.id, data.value, (long int)data.ts);
+        snprintf(log_msg, sizeof(log_msg),
+                 "handle_client: Received data - Sensor ID = %" PRIu16 ", Value = %.2f, Timestamp = %ld",
+                 data.id, data.value, (long int)data.ts);
+        write_log(log_msg);
 
-        // Log the opening of the connection only for the first message
         if (first_message) {
             snprintf(log_msg, sizeof(log_msg), "Sensor node %" PRIu16 " has opened a new connection", data.id);
             write_log(log_msg);
             first_message = 0;
         }
 
-        if (sbuffer_insert(shared_buffer, &data) != SBUFFER_SUCCESS) {
-            fprintf(stderr, "Failed to insert data into shared buffer\n");
+        sensor_data_t local_data = {0};
+        local_data.id = data.id;
+        local_data.value = data.value;
+        local_data.ts = data.ts;
+        local_data.processed = 0;
+
+        // Insert data into the shared buffer
+        if (sbuffer_insert(shared_buffer, &local_data) != SBUFFER_SUCCESS) {
+            write_log("handle_client: Failed to insert data into shared buffer");
             break;
         }
     } while (1);
 
+    // Handle connection closure or error
     if (result == TCP_CONNECTION_CLOSED) {
         snprintf(log_msg, sizeof(log_msg), "Sensor node %" PRIu16 " has closed the connection", data.id);
         write_log(log_msg);
     } else {
-        fprintf(stderr, "Error occurred on connection.\n");
+        write_log("handle_client: Connection error occurred");
     }
 
     tcp_close(&client);
@@ -201,11 +213,11 @@ void *handle_client(void *arg) {
     pthread_mutex_lock(&state.conn_mutex);
     state.conn_counter--;
     if (state.conn_counter == 0) {
-        state.server_running = 0; // Signal server shutdown
+        state.server_running = 0;
     }
     pthread_mutex_unlock(&state.conn_mutex);
 
-    printf("Client thread exiting.\n");
+    write_log("handle_client: Client thread exiting");
     pthread_exit(NULL);
 }
 
@@ -219,7 +231,6 @@ void connmgr_listen() {
     while (1) {
         tcpsock_t *client;
 
-        // Check if server should stop running
         pthread_mutex_lock(&state.conn_mutex);
         if (!state.server_running) {
             pthread_mutex_unlock(&state.conn_mutex);
@@ -227,7 +238,6 @@ void connmgr_listen() {
         }
         pthread_mutex_unlock(&state.conn_mutex);
 
-        // Check if maximum connections have been reached
         pthread_mutex_lock(&state.conn_mutex);
         if (state.conn_counter >= state.max_connections) {
             pthread_mutex_unlock(&state.conn_mutex);
@@ -236,20 +246,17 @@ void connmgr_listen() {
         }
         pthread_mutex_unlock(&state.conn_mutex);
 
-        // Wait for a new connection
         if (tcp_wait_for_connection(state.server_socket, &client) != TCP_NO_ERROR) {
             fprintf(stderr, "Error accepting client connection\n");
             continue;
         }
 
-        // Increment connection counter
         pthread_mutex_lock(&state.conn_mutex);
         state.conn_counter++;
         pthread_mutex_unlock(&state.conn_mutex);
 
         printf("Accepted new client connection (%d/%d)\n", state.conn_counter, state.max_connections);
 
-        // Create a thread to handle the new client
         if (pthread_create(&threads[thread_index++], NULL, handle_client, client) != 0) {
             fprintf(stderr, "Failed to create thread for client.\n");
             tcp_close(&client);
@@ -260,7 +267,6 @@ void connmgr_listen() {
         }
     }
 
-    // Wait for all threads to finish
     printf("Waiting for all threads to complete...\n");
     for (int i = 0; i < thread_index; i++) {
         pthread_join(threads[i], NULL);

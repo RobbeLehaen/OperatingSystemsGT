@@ -63,7 +63,7 @@ int sbuffer_free(sbuffer_t **buffer) {
     buf->tail = NULL;
     buf->size = 0;
 
-    pthread_cond_broadcast(&(buf->buffer_not_empty));  // Wake up any waiting threads
+    pthread_cond_broadcast(&(buf->buffer_not_empty));
     pthread_mutex_unlock(&(buf->buffer_lock));
 
     pthread_mutex_destroy(&(buf->buffer_lock));
@@ -81,23 +81,18 @@ int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
 
     pthread_mutex_lock(&(buffer->buffer_lock));
 
-    struct sbuffer_node *current = buffer->head;
-    while (current) {
-        if (current->data.id == data->id && current->data.ts == data->ts) {
-            pthread_mutex_unlock(&(buffer->buffer_lock));
-            return SBUFFER_DUPLICATE;
-        }
-        current = current->next;
-    }
-
+    // Deep copy the sensor data
     struct sbuffer_node *new_node = malloc(sizeof(struct sbuffer_node));
     if (new_node == NULL) {
         pthread_mutex_unlock(&(buffer->buffer_lock));
+        write_log("sbuffer_insert: Memory allocation failed");
         return SBUFFER_FAILURE;
     }
 
-    new_node->data = *data;
-    new_node->data.processed = 0;
+    new_node->data.id = data->id;
+    new_node->data.value = data->value;
+    new_node->data.ts = data->ts;
+    new_node->data.processed = data->processed;
     new_node->next = NULL;
 
     if (buffer->tail == NULL) {
@@ -112,7 +107,6 @@ int sbuffer_insert(sbuffer_t *buffer, sensor_data_t *data) {
     pthread_cond_signal(&(buffer->buffer_not_empty));
 
     pthread_mutex_unlock(&(buffer->buffer_lock));
-
     return SBUFFER_SUCCESS;
 }
 
@@ -126,29 +120,28 @@ int sbuffer_remove(sbuffer_t *buffer, sensor_data_t **data) {
     while (buffer->size == 0) {
         if (pthread_cond_wait(&(buffer->buffer_not_empty), &(buffer->buffer_lock)) != 0) {
             pthread_mutex_unlock(&(buffer->buffer_lock));
+            write_log("sbuffer_remove: Condition wait error");
             return SBUFFER_FAILURE;
         }
     }
 
     struct sbuffer_node *node_to_remove = buffer->head;
 
-    // Allocate memory for the data being removed
     *data = malloc(sizeof(sensor_data_t));
     if (*data == NULL) {
         pthread_mutex_unlock(&(buffer->buffer_lock));
+        write_log("sbuffer_remove: Memory allocation failed");
         return SBUFFER_FAILURE;
     }
 
-    // Copy data from the node
     **data = node_to_remove->data;
 
-    // Update the head of the buffer
     buffer->head = node_to_remove->next;
     if (buffer->head == NULL) {
         buffer->tail = NULL;
     }
 
-    free(node_to_remove); // Free the buffer node itself
+    free(node_to_remove);
     buffer->size--;
 
     pthread_mutex_unlock(&(buffer->buffer_lock));

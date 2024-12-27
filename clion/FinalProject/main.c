@@ -114,31 +114,31 @@ int main(int argc, char *argv[]) {
     int max_clients = atoi(argv[2]);
 
     if (init_logging() != 0) {
-        fprintf(stderr, "Failed to initialize logging\n");
+        write_log("Failed to initialize logging\n");
         exit(EXIT_FAILURE);
     }
 
     write_log("Server started");
 
     if (sbuffer_init(&shared_buffer) != SBUFFER_SUCCESS) {
-        fprintf(stderr, "Failed to initialize shared buffer\n");
+        write_log("Failed to initialize shared buffer\n");
         exit(EXIT_FAILURE);
     }
 
     pthread_t data_manager_tid, storage_manager_tid;
 
     if (pthread_create(&data_manager_tid, NULL, data_manager_thread, NULL) != 0) {
-        perror("Error creating data manager thread");
+        write_log("Error creating data manager thread");
         exit(EXIT_FAILURE);
     }
 
     if (pthread_create(&storage_manager_tid, NULL, storage_manager_thread, NULL) != 0) {
-        perror("Error creating storage manager thread");
+        write_log("Error creating storage manager thread");
         exit(EXIT_FAILURE);
     }
 
     if (connmgr_init(port, max_clients, shared_buffer) != 0) {
-        fprintf(stderr, "Failed to initialize connection manager\n");
+        write_log("Failed to initialize connection manager\n");
         exit(EXIT_FAILURE);
     }
 
